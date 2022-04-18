@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="Author" content="Captain Chen">
+    <meta name="Keywords" content="web chat">
+    <title>Web Chat</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .top {
+            height: 60px;
+            margin-bottom: 1px;
+            flex-shrink: 0;
+        }
+
+        .bottom {
+            height: 160px;
+            margin-top: 1px;
+            flex-shrink: 0;
+        }
+
+        .middle {
+            display: block;
+            max-width: 100%;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            flex-basis: auto;
+            flex: 1;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        .left {
+            float: left;
+            overflow: hidden;
+            width: 200px;
+            margin-right: 1px;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .right {
+            overflow: hidden;
+            height: 100%;
+            margin-left: 0px;
+            flex-shrink: 1;
+        }
+
+        .col_container {
+            display: flex;
+            flex-direction: column;
+            flex-basis: auto;
+        }
+
+        .row_container {
+            display: flex;
+            flex-direction: row;
+            flex-basis: auto;
+        }
+
+        p {
+            padding: 3px;
+        }
+
+        #input_box {
+            overflow: auto;
+            margin: 5px;
+            padding: 3px;
+            border: 2px rgb(0, 91, 148) solid;
+            height: 87%;
+            width: 98.5%;
+        }
+
+        #msg_log {
+            padding: 10px;
+            max-height: 100%;
+            word-wrap: break-word;
+            width: 98.5%;
+        }
+    </style>
+    <script src="./static/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+        });
+    </script>
+</head>
+
+<body id="parent" class="row_container" style="background-color:rgb(95, 154, 255)">
+    <aside id="friends" class="left col_container" style="background-color: rgb(227, 248, 255);">
+        1
+    </aside>
+    <div id="chat" class="right col_container">
+        <div id="chat_hearder" class="top" style="background-color: rgb(227, 248, 255);">
+            <p id="friend_name">asdfasdf</p>
+        </div>
+        <div id="div_msg_log" class="middle" style="background-color: rgb(227, 248, 255);">
+            <div id="msg_log">
+                sdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdfsd
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
+            </div>
+        </div>
+        <div id="chat_input" class="bottom" style="background-color: rgb(255, 255, 255);">
+            <div id="input_box" contenteditable='true'>
+                输入消息
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
