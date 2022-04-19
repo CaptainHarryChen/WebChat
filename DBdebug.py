@@ -1,3 +1,4 @@
+import sqlite3
 
 usersDB = sqlite3.connect("users.db")
 usersDB.execute('''create table if not exists users

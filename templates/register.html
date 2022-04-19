@@ -81,46 +81,66 @@
 
         .lightIt {
             display: inline;
-            color: red
+            color: red;
         }
     </style>
     <script src="./static/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            state = $("#login_state").text();
+            state = $("#regis_state").text();
             $("#check_name_status").addClass("hideIt").removeClass("lightIt");
-            $("#check_password").addClass("hideIt").removeClass("lightIt");
-            if (state == "user-not-exist")
+            $("#check_pwd_state").addClass("hideIt").removeClass("lightIt");
+            if (state == "user-exist")
                 $("#check_name_status").addClass("lightIt").removeClass("hideIt");
             else if (state == "password-error")
-                $("#check_password").addClass("lightIt").removeClass("hideIt");
+                $("#check_pwd_state").addClass("lightIt").removeClass("hideIt");
+
+            $("#user-input").blur(function () {
+                $("#check_name_status").addClass("hideIt").removeClass("lightIt");
+                $.post("/CheckUserName", { user_name: $("#user-input").val() }, function (ret) {
+                    if (ret == "0")
+                        $("#check_name_status").addClass("lightIt").removeClass("hideIt");
+                });
+            });
+            $("#pwd_rp").blur(function () {
+                $("#check_pwd_status").addClass("hideIt").removeClass("lightIt");
+                if ($("#pwd").val() != $("#pwd_rp").val())
+                    $("#check_pwd_status").addClass("lightIt").removeClass("hideIt");
+            });
+            $("form").submit(function () {
+                if ($("#check_name_status").hasClass("lightIt") || $("#check_pwd_status").hasClass("lightIt"))
+                    return false;
+                return true;
+            });
         });
     </script>
 </head>
 
 <body style="background-color:#f6f8fb">
     <h1 style="padding:50px;color: #1e7db9;">Web Chat</h1>
-    <div id="login_state" style="display:none">{{login_state}}</div>
+    <div id="regis_state" style="display:none">{{regis_state}}</div>
     <div id="login_box">
-        <div style="width: 100%;height: 38px;font-size: 22px;margin: 25px 0 20px 0;">登录</div>
-        <form action="/login" method="post">
+        <div style="width: 100%;height: 38px;font-size: 22px;margin: 25px 0 20px 0;">注册</div>
+        <form action="/regis" method="post">
             <div style="margin-bottom: 22px;">
-                <input id="user-name" type="text" name="user-name" autocomplete="off" placeholder="用戶名" maxlength="20"
+                <input id="user-input" name="user-input" type="text" autocomplete="off" placeholder="用戶名" maxlength="11"
                     class="input_box">
-                <span id="check_name_status" class="hideIt">用户名不存在</span>
+                <span id="check_name_status" class="hideIt">用户名已被使用</span>
             </div>
             <div style="margin-bottom: 22px;">
-                <input id="password" type="password" name="password" autocomplete="off" placeholder="密码" maxlength="16"
-                    class="input_box">
-                <span id="check_password" class="hideIt">密码错误！</span>
+                <input id="pwd" name="pwd" type="password" autocomplete="off" placeholder="密码" class="input_box">
             </div>
             <div style="margin-bottom: 22px;">
-                <button id="submit-button" type="submit" class="button blue">
-                    <span>立即登录</span>
+                <input id="pwd_rp" name="pwd_rp" type="password" autocomplete="off" placeholder="重新输入密码" class="input_box">
+                <span id="check_pwd_status" class="hideIt">两次密码输入不一致</span>
+            </div>
+            <div style="margin-bottom: 22px;">
+                <button type="submit" class="button blue">
+                    <span>立即注册</span>
                 </button>
             </div>
-            <a href="/register" style="color:#409eff; text-decoration: none">
-                <span>还没有账号？立即注册 </span>
+            <a href="/" style="color:#409eff; text-decoration: none">
+                <span>已有帐号？立即登录 </span>
             </a>
         </form>
     </div>

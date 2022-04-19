@@ -9,8 +9,8 @@
     <style>
         #login_box {
             position: absolute;
-            width: 350px;
-            min-height: 480px;
+            width: 480px;
+            min-height: 200px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -74,10 +74,44 @@
             background: -moz-linear-gradient(top, #1a71a8, #1976b1);
             background: linear-gradient(top, #1a71a8, #1976b1);
         }
+
+        .hideIt {
+            display: none
+        }
+
+        .lightIt {
+            display: inline;
+            color: red;
+        }
     </style>
     <script src="./static/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            state = $("#regis_state").text();
+            $("#check_name_status").addClass("hideIt").removeClass("lightIt");
+            $("#check_pwd_state").addClass("hideIt").removeClass("lightIt");
+            if (state == "user-exist")
+                $("#check_name_status").addClass("lightIt").removeClass("hideIt");
+            else if (state == "password-error")
+                $("#check_pwd_state").addClass("lightIt").removeClass("hideIt");
+
+            $("#user-input").blur(function () {
+                $("#check_name_status").addClass("hideIt").removeClass("lightIt");
+                $.post("/CheckUserName", { user_name: $("#user-input").val() }, function (ret) {
+                    if (ret == "0")
+                        $("#check_name_status").addClass("lightIt").removeClass("hideIt");
+                });
+            });
+            $("#pwd_rp").blur(function () {
+                $("#check_pwd_status").addClass("hideIt").removeClass("lightIt");
+                if ($("#pwd").val() != $("#pwd_rp").val())
+                    $("#check_pwd_status").addClass("lightIt").removeClass("hideIt");
+            });
+            $("form").submit(function () {
+                if ($("#check_name_status").hasClass("lightIt") || $("#check_pwd_status").hasClass("lightIt"))
+                    return false;
+                return true;
+            });
         });
     </script>
 </head>
@@ -85,24 +119,11 @@
 <body style="background-color:#f6f8fb">
     <h1 style="padding:50px;color: #1e7db9;">Web Chat</h1>
     <div id="login_box">
-        <div style="width: 100%;height: 38px;font-size: 22px;margin: 25px 0 20px 0;">注册</div>
-        <form>
-            <div style="margin-bottom: 22px;">
-                <input type="text" autocomplete="off" placeholder="用戶名" maxlength="11" class="input_box">
-            </div>
-            <div style="margin-bottom: 22px;">
-                <input type="password" autocomplete="off" placeholder="密码" class="input_box">
-            </div>
-            <div style="margin-bottom: 22px;">
-                <input type="password" autocomplete="off" placeholder="重新输入密码" class="input_box">
-            </div>
-            <div style="margin-bottom: 22px;">
-                <button type="button" class="button blue">
-                    <span>立即注册 </span>
-                </button>
-            </div>
-        </form>
-    </div>
+        <div style="position:absolute;top:50%;left:50%;transform: translate(-50%, -50%);font-size: 30px;color:#1e7db9;">
+            注册成功！</div>
+        <a href="/" style="position:absolute;bottom:20px;right:20px;color:#409eff; text-decoration: none">
+            <span>立即登录 </span>
+        </a>
     </div>
 
 </body>
