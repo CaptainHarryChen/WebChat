@@ -52,6 +52,13 @@
             flex-shrink: 1;
         }
 
+        .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         .col_container {
             display: flex;
             flex-direction: column;
@@ -64,6 +71,41 @@
             flex-basis: auto;
         }
 
+        .button {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 1px #333;
+            border-radius: 5px;
+            margin: 0 20px 20px 0;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .button.blue {
+            border: 1px solid #1e7db9;
+            box-shadow: 0 1px 2px #8fcaee inset, 0 -1px 0 #497897 inset, 0 -2px 3px #8fcaee inset;
+            background: -webkit-linear-gradient(top, #42a4e0, #2e88c0);
+            background: -moz-linear-gradient(top, #42a4e0, #2e88c0);
+            background: linear-gradient(top, #42a4e0, #2e88c0);
+        }
+
+        .blue:hover {
+            background: -webkit-linear-gradient(top, #70bfef, #4097ce);
+            background: -moz-linear-gradient(top, #70bfef, #4097ce);
+            background: linear-gradient(top, #70bfef, #4097ce);
+        }
+
+        .blue:active {
+            top: 1px;
+            box-shadow: 0 1px 3px #114566 inset, 0 3px 0 #fff;
+            background: -webkit-linear-gradient(top, #1a71a8, #1976b1);
+            background: -moz-linear-gradient(top, #1a71a8, #1976b1);
+            background: linear-gradient(top, #1a71a8, #1976b1);
+        }
+
         p {
             padding: 3px;
         }
@@ -72,9 +114,14 @@
             overflow: auto;
             margin: 5px;
             padding: 3px;
-            border: 2px rgb(0, 91, 148) solid;
-            height: 87%;
-            width: 98.5%;
+            border: 1px rgb(109, 109, 109) solid;
+            height: calc(100% - 20px);
+            width: calc(100% - 100px);
+        }
+
+        #input_box:empty::before {
+            color: lightgrey;
+            content: attr(placeholder);
         }
 
         #msg_log {
@@ -84,16 +131,45 @@
             width: 98.5%;
         }
     </style>
+    <script src="./jquery-3.6.0.min.js"></script>
+    <script src="./chat-function.js"></script>
     <script src="./static/jquery-3.6.0.min.js"></script>
+    <script src="./static/chat-function.js"></script>
     <script>
         $(document).ready(function () {
+            $.post("/GetSelfName", {}, function (ret) {
+                $("#self").html(ret);
+            });
         });
     </script>
 </head>
 
-<body id="parent" class="row_container" style="background-color:rgb(95, 154, 255)">
-    <aside id="friends" class="left col_container" style="background-color: rgb(227, 248, 255);">
-        1
+<body id="parent" class="row_container" style="background-color:rgb(192, 192, 192)">
+    <aside id="left_aside" class="left col_container" style="background-color: rgb(227, 248, 255);">
+        <header class="top" style="background-color:#2cabfa;border-bottom:1px rgb(192, 192, 192) solid">
+            <p id="self"
+                style="line-height:60px;text-shadow: 1px 1px 1px #333;font-size:20px;font-weight: bold;text-align: center;color:#fff;margin:0;">
+            </p>
+        </header>
+        <div id="friends" class="middle col_container" style="background-color:#6cc7ff">
+            1
+        </div>
+        <footer id="functions" class="bottom col_container"
+            style="height:100px;border-top: 1px rgb(192, 192, 192) solid;">
+            <div class="row_container" style="height:50px">
+                <button class="button blue" style="width:100px;height:30px;margin:10px">
+                    添加好友
+                </button>
+                <button class="button blue" style="width:100px;height:30px;margin:10px">
+                    创建群组
+                </button>
+            </div>
+            <div class="row_container" style="height:50px">
+                <button class="button blue" style="width:100%;height:30px;margin:10px">
+                    退出登录
+                </button>
+            </div>
+        </footer>
     </aside>
     <div id="chat" class="right col_container">
         <div id="chat_hearder" class="top" style="background-color: rgb(227, 248, 255);">
@@ -122,9 +198,7 @@
             </div>
         </div>
         <div id="chat_input" class="bottom" style="background-color: rgb(255, 255, 255);">
-            <div id="input_box" contenteditable='true'>
-                输入消息
-            </div>
+            <div id="input_box" class="input_box" placeholder="请输入消息" contenteditable></div>
         </div>
     </div>
 </body>

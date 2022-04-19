@@ -17,6 +17,13 @@ def CheckUserName():
     return "0"
 
 
+@app.route("/GetSelfName", methods=("POST",))
+def GetSelfName():
+    if "userName" in session.keys():
+        return session["userName"]
+    return ""
+
+
 @app.route("/")
 def index():
     return render_template("index.html", login_state="1")
