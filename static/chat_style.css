@@ -1,0 +1,187 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+.top {
+    height: 60px;
+    margin-bottom: 1px;
+    flex-shrink: 0;
+}
+
+.bottom {
+    height: 160px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.middle {
+    display: block;
+    max-width: 100%;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    flex-basis: auto;
+    flex: 1;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.left {
+    float: left;
+    overflow: hidden;
+    width: 250px;
+    margin-right: 1px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.right {
+    overflow: hidden;
+    height: 100%;
+    margin-left: 0px;
+    flex-shrink: 1;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.col_container {
+    display: flex;
+    flex-direction: column;
+    flex-basis: auto;
+}
+
+.row_container {
+    display: flex;
+    flex-direction: row;
+    flex-basis: auto;
+}
+
+.button {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 1px #333;
+    border-radius: 5px;
+    margin: 0 20px 20px 0;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.button.blue {
+    border: 1px solid #1e7db9;
+    box-shadow: 0 1px 2px #8fcaee inset, 0 -1px 0 #497897 inset, 0 -2px 3px #8fcaee inset;
+    background: -webkit-linear-gradient(top, #42a4e0, #2e88c0);
+    background: -moz-linear-gradient(top, #42a4e0, #2e88c0);
+    background: linear-gradient(top, #42a4e0, #2e88c0);
+}
+
+.blue:hover {
+    background: -webkit-linear-gradient(top, #70bfef, #4097ce);
+    background: -moz-linear-gradient(top, #70bfef, #4097ce);
+    background: linear-gradient(top, #70bfef, #4097ce);
+}
+
+.blue:active {
+    top: 1px;
+    box-shadow: 0 1px 3px #114566 inset, 0 3px 0 #fff;
+    background: -webkit-linear-gradient(top, #1a71a8, #1976b1);
+    background: -moz-linear-gradient(top, #1a71a8, #1976b1);
+    background: linear-gradient(top, #1a71a8, #1976b1);
+}
+
+p {
+    padding: 3px;
+}
+
+#input_box {
+    overflow: auto;
+    margin: 5px;
+    padding: 3px;
+    border: 1px rgb(109, 109, 109) solid;
+    height: calc(100% - 20px);
+    width: calc(100% - 100px);
+}
+
+#input_box:empty::before {
+    color: lightgrey;
+    content: attr(placeholder);
+}
+
+#msg_log {
+    padding: 10px;
+    max-height: 100%;
+    word-wrap: break-word;
+    width: 98.5%;
+}
+
+.friend_box {
+    padding: 8px 10px;
+    height: 50px;
+    cursor: pointer;
+    background-color: #6cc7ff;
+}
+
+.friend_box:hover {
+    background-color: #afe0ff;
+}
+
+.friend_box.active {
+    background-color: #afe0ff;
+}
+
+.card_box {
+    height: 40px;
+    align-content: center;
+    margin-left: 10px;
+    overflow: hidden;
+}
+
+.card_title {
+    height: 20px;
+}
+
+.card_name {
+    color: #1f2329;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 20px;
+    width: 200px;
+    flex: 1 1;
+    align-items: center;
+    overflow: hidden;
+    margin-right: 3px;
+}
+
+.card_time {
+    color: #414448;
+    font-size: 12px;
+    margin-left: 10px;
+    user-select: none;
+}
+
+.card_content {
+    font-size: 13px;
+    line-height: 18px;
+    color: #414448;
+    margin-top: 3px;
+    font-weight: 300;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.avatar {
+    height: 35px;
+    width: 35px;
+    border-radius: 3px;
+}
