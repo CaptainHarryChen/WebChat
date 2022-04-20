@@ -6,139 +6,25 @@
     <meta name="Author" content="Captain Chen">
     <meta name="Keywords" content="web chat">
     <title>Web Chat</title>
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
 
-        .top {
-            height: 60px;
-            margin-bottom: 1px;
-            flex-shrink: 0;
-        }
-
-        .bottom {
-            height: 160px;
-            margin-top: 1px;
-            flex-shrink: 0;
-        }
-
-        .middle {
-            display: block;
-            max-width: 100%;
-            margin-top: 0px;
-            margin-bottom: 0px;
-            flex-basis: auto;
-            flex: 1;
-            overflow-y: scroll;
-            overflow-x: hidden;
-        }
-
-        .left {
-            float: left;
-            overflow: hidden;
-            width: 200px;
-            margin-right: 1px;
-            height: 100%;
-            flex-shrink: 0;
-        }
-
-        .right {
-            overflow: hidden;
-            height: 100%;
-            margin-left: 0px;
-            flex-shrink: 1;
-        }
-
-        .center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .col_container {
-            display: flex;
-            flex-direction: column;
-            flex-basis: auto;
-        }
-
-        .row_container {
-            display: flex;
-            flex-direction: row;
-            flex-basis: auto;
-        }
-
-        .button {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 1px 1px 1px #333;
-            border-radius: 5px;
-            margin: 0 20px 20px 0;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .button.blue {
-            border: 1px solid #1e7db9;
-            box-shadow: 0 1px 2px #8fcaee inset, 0 -1px 0 #497897 inset, 0 -2px 3px #8fcaee inset;
-            background: -webkit-linear-gradient(top, #42a4e0, #2e88c0);
-            background: -moz-linear-gradient(top, #42a4e0, #2e88c0);
-            background: linear-gradient(top, #42a4e0, #2e88c0);
-        }
-
-        .blue:hover {
-            background: -webkit-linear-gradient(top, #70bfef, #4097ce);
-            background: -moz-linear-gradient(top, #70bfef, #4097ce);
-            background: linear-gradient(top, #70bfef, #4097ce);
-        }
-
-        .blue:active {
-            top: 1px;
-            box-shadow: 0 1px 3px #114566 inset, 0 3px 0 #fff;
-            background: -webkit-linear-gradient(top, #1a71a8, #1976b1);
-            background: -moz-linear-gradient(top, #1a71a8, #1976b1);
-            background: linear-gradient(top, #1a71a8, #1976b1);
-        }
-
-        p {
-            padding: 3px;
-        }
-
-        #input_box {
-            overflow: auto;
-            margin: 5px;
-            padding: 3px;
-            border: 1px rgb(109, 109, 109) solid;
-            height: calc(100% - 20px);
-            width: calc(100% - 100px);
-        }
-
-        #input_box:empty::before {
-            color: lightgrey;
-            content: attr(placeholder);
-        }
-
-        #msg_log {
-            padding: 10px;
-            max-height: 100%;
-            word-wrap: break-word;
-            width: 98.5%;
-        }
+    <style type="text/css">
+        @import url("./chat_style.css");
+        @import url("./static/chat_style.css");
     </style>
     <script src="./jquery-3.6.0.min.js"></script>
-    <script src="./chat-function.js"></script>
     <script src="./static/jquery-3.6.0.min.js"></script>
-    <script src="./static/chat-function.js"></script>
+
     <script>
         $(document).ready(function () {
             $.post("/GetSelfName", {}, function (ret) {
                 $("#self").html(ret);
+            });
+            $.post("/GetFriends", {}, function (ret) {
+                var data = $.parseJSON(ret);
+                for (i in data) {
+                    var name = data[i]["name"];
+                    $("#friends").append('<div id="friend_' + name + '" class="friend_box row_container"><img src="./static/avatar.jfif" class="avatar"><div class="col_container card_box"><div class="row_container card_title"><div class="card_name">' + name + '</div><div class="card_time">04-20 10:54</div></div><div class="card_content">hahahaha</div></div></div>');
+                }
             });
         });
     </script>
@@ -152,15 +38,24 @@
             </p>
         </header>
         <div id="friends" class="middle col_container" style="background-color:#6cc7ff">
-            1
+            <div class="friend_box row_container">
+                <img src="./static/avatar.jfif" class="avatar">
+                <div class="col_container card_box">
+                    <div class="row_container card_title">
+                        <div class="card_name">test</div>
+                        <div class="card_time">04-20 10:54</div>
+                    </div>
+                    <div class="card_content">hahahaha</div>
+                </div>
+            </div>
         </div>
         <footer id="functions" class="bottom col_container"
             style="height:100px;border-top: 1px rgb(192, 192, 192) solid;">
             <div class="row_container" style="height:50px">
-                <button class="button blue" style="width:100px;height:30px;margin:10px">
+                <button class="button blue" style="width:200px;height:30px;margin:10px">
                     添加好友
                 </button>
-                <button class="button blue" style="width:100px;height:30px;margin:10px">
+                <button class="button blue" style="width:200px;height:30px;margin:10px">
                     创建群组
                 </button>
             </div>

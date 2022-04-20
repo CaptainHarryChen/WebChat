@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import json
 from flask import Flask, request, render_template, session, redirect
 
 app = Flask(__name__)
@@ -22,6 +23,19 @@ def GetSelfName():
     if "userName" in session.keys():
         return session["userName"]
     return ""
+
+
+@app.route("/GetFriends", methods=("POST",))
+def GetFriends():
+    user_name = session["userName"]
+    DB = sqlite3.connect(f".\\userdatas\\{user_name}.db")
+    cur = DB.execute("select name from friends")
+    names = list([{"name":name[0]} for name in cur.fetchall()])
+
+    jsonData = json.dumps(names, sort_keys=True,
+                          indent=4, separators=(',', ': '))
+    print(jsonData)
+    return jsonData
 
 
 @app.route("/")
