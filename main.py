@@ -34,7 +34,6 @@ def GetFriends():
 
     jsonData = json.dumps(names, sort_keys=True,
                           indent=4, separators=(',', ': '))
-    print(jsonData)
     return jsonData
 
 
