@@ -16,6 +16,8 @@
 
     <script>
         $(document).ready(function () {
+            $(".friend_box").click(OnFriendBoxClick);
+
             $.post("/GetSelfName", {}, function (ret) {
                 $("#self").html(ret);
             });
@@ -23,10 +25,25 @@
                 var data = $.parseJSON(ret);
                 for (i in data) {
                     var name = data[i]["name"];
-                    $("#friends").append('<div id="friend_' + name + '" class="friend_box row_container"><img src="./static/avatar.jfif" class="avatar"><div class="col_container card_box"><div class="row_container card_title"><div class="card_name">' + name + '</div><div class="card_time">04-20 10:54</div></div><div class="card_content">hahahaha</div></div></div>');
+                    $("#friends").append('<div id="friend_' + name + '" class="friend_box row_container" name="' + name + '"><img src="./static/avatar.jfif" class="avatar"><div class="col_container card_box"><div class="row_container card_title"><div class="card_name">' + name + '</div><div class="card_time">04-20 10:54</div></div><div class="card_content">hahahaha</div></div></div>');
+                    $("#friend_" + name).click(OnFriendBoxClick);
                 }
             });
+
+            $("#add_friend").click(function () {
+
+            });
         });
+
+        function SetMsgLog(name) {
+            $("#friend_name").html(name);
+        }
+
+        function OnFriendBoxClick() {
+            $(".friend_box").removeClass("active");
+            $(this).addClass("active");
+            SetMsgLog($(this).attr("name"));
+        }
     </script>
 </head>
 
@@ -38,7 +55,7 @@
             </p>
         </header>
         <div id="friends" class="middle col_container" style="background-color:#6cc7ff">
-            <div class="friend_box row_container">
+            <div class="friend_box row_container" name="test">
                 <img src="./static/avatar.jfif" class="avatar">
                 <div class="col_container card_box">
                     <div class="row_container card_title">
@@ -52,7 +69,7 @@
         <footer id="functions" class="bottom col_container"
             style="height:100px;border-top: 1px rgb(192, 192, 192) solid;">
             <div class="row_container" style="height:50px">
-                <button class="button blue" style="width:200px;height:30px;margin:10px">
+                <button id="add_friend" class="button blue" style="width:200px;height:30px;margin:10px">
                     添加好友
                 </button>
                 <button class="button blue" style="width:200px;height:30px;margin:10px">
@@ -67,8 +84,8 @@
         </footer>
     </aside>
     <div id="chat" class="right col_container">
-        <div id="chat_hearder" class="top" style="background-color: rgb(227, 248, 255);">
-            <p id="friend_name">asdfasdf</p>
+        <div id="chat_hearder" class="top" style="background-color: rgb(227, 248, 255);color:rgb(110, 146, 255);text-shadow: 1px 1px 1px rgb(94, 94, 94);font-size:30px;">
+            <p id="friend_name" style="margin:10px;">asdfasdf</p>
         </div>
         <div id="div_msg_log" class="middle" style="background-color: rgb(227, 248, 255);">
             <div id="msg_log">
