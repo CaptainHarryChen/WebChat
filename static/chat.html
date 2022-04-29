@@ -15,11 +15,12 @@
     <script src="./static/jquery-3.6.0.min.js"></script>
 
     <script>
+        var selfName;
         $(document).ready(function () {
             $(".friend_box").click(OnFriendBoxClick);
-
             $.post("/GetSelfName", {}, function (ret) {
                 $("#self").html(ret);
+                selfName = ret;
             });
             $.post("/GetFriends", {}, function (ret) {
                 var data = $.parseJSON(ret);
@@ -37,12 +38,30 @@
 
         function SetMsgLog(name) {
             $("#friend_name").html(name);
+            $("#msg_log").html('<div id="msg_loading" class="center"><div class="center">加载中……</div></div>');
+            $.post("/GetMsgLog", { "class": selfName, "name": name }, function (ret) {
+                var logs = $.parseJSON(ret);
+                ShowMsgLog(logs);
+            });
         }
 
         function OnFriendBoxClick() {
             $(".friend_box").removeClass("active");
             $(this).addClass("active");
             SetMsgLog($(this).attr("name"));
+        }
+
+        function ShowMsgLog(logs) {
+            $("#msg_log").html("")
+            for (i in logs) {
+                var name = logs[i][1];
+                var time = logs[i][2];
+                var content = logs[i][3];
+                time = time.slice(0, 4) + "/" + time.slice(4, 6) + "/" + time.slice(6, 8) + " " + time.slice(8, 10) + ":" + time.slice(10, 12) + ":" + time.slice(12, 14);
+                content = content.replace("\n", "<br>");
+                $("#msg_log").append('<div class="onemsg"><header class="onemsg-header">' + name + ' ' + time + '</header><div class="onemsg-content">' + content + '</div></div>');
+            }
+            $("#div_msg_log").scrollTop($("#div_msg_log").height());
         }
     </script>
 </head>
@@ -84,29 +103,12 @@
         </footer>
     </aside>
     <div id="chat" class="right col_container">
-        <div id="chat_hearder" class="top" style="background-color: rgb(227, 248, 255);color:rgb(110, 146, 255);text-shadow: 1px 1px 1px rgb(94, 94, 94);font-size:30px;">
+        <div id="chat_hearder" class="top"
+            style="background-color: rgb(227, 248, 255);color:rgb(110, 146, 255);text-shadow: 1px 1px 1px rgb(94, 94, 94);font-size:30px;">
             <p id="friend_name" style="margin:10px;">asdfasdf</p>
         </div>
         <div id="div_msg_log" class="middle" style="background-color: rgb(227, 248, 255);">
             <div id="msg_log">
-                sdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdsdfsdfsdfsd
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
-                sdfsdfsdsdfsdfsdsdfsdfsdsd<br>
             </div>
         </div>
         <div id="chat_input" class="bottom" style="background-color: rgb(255, 255, 255);">

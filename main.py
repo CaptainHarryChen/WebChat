@@ -30,10 +30,29 @@ def GetFriends():
     user_name = session["userName"]
     DB = sqlite3.connect(f".\\userdatas\\{user_name}.db")
     cur = DB.execute("select name from friends")
-    names = list([{"name":name[0]} for name in cur.fetchall()])
+    names = list([{"name": name[0]} for name in cur.fetchall()])
 
     jsonData = json.dumps(names, sort_keys=True,
                           indent=4, separators=(',', ': '))
+    return jsonData
+
+
+@app.route("/GetMsgLog", methods=("POST",))
+def GetMsgLog():
+    user_name = session["userName"]
+    typ = request.form["class"]
+    name = request.form["name"]
+
+    DB = sqlite3.connect(f".\\msglogdb\\{typ}.db")
+    DB.execute(
+        f'''create table if not exists {name} (id int primary key not null,username,time varchar(14),content)''')
+    cur = DB.execute(
+        f"select id,username,time,content from {name} order by id asc")
+    logs = list(cur.fetchall())
+
+    jsonData = json.dumps(logs, sort_keys=True,
+                          indent=4, separators=(',', ': '))
+    #print(jsonData)
     return jsonData
 
 
