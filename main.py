@@ -13,6 +13,7 @@ def CheckUserName():
     cur = usersDB.execute(
         "select password from users where name='"+user_name+"'")
     DBpwd = cur.fetchone()
+    userDB.close()
     if DBpwd is None:
         return "1"
     return "0"
@@ -31,10 +32,42 @@ def GetFriends():
     DB = sqlite3.connect(f".\\userdatas\\{user_name}.db")
     cur = DB.execute("select name from friends")
     names = list([{"name": name[0]} for name in cur.fetchall()])
+    DB.close()
 
     jsonData = json.dumps(names, sort_keys=True,
                           indent=4, separators=(',', ': '))
     return jsonData
+
+
+@app.route("/AddFriend", methods=("POST",))
+def AddFriend():
+    user_name = session["userName"]
+    friend_name = request.form["user2"]
+
+    usersDB = sqlite3.connect(".\\users.db")
+    cur = usersDB.execute(
+        "select name from users where name='"+friend_name+"'")
+    if cur.fetchone() is None:
+        usersDB.close()
+        return "not-exist"
+    usersDB.close()
+
+    DB = sqlite3.connect(f".\\userdatas\\{user_name}.db")
+    cur = DB.execute(f"select name from friends where name='{friend_name}'")
+    if cur.fetchone() is not None:
+        DB.close()
+        return "exist"
+    DB.execute(f"insert into friends (name) values('{friend_name}')")
+    DB.commit()
+    DB.close()
+
+    DB = sqlite3.connect(f".\\userdatas\\{friend_name}.db")
+    cur = DB.execute(f"select name from friends where name='{user_name}'")
+    DB.execute(f"insert into friends (name) values('{user_name}')")
+    DB.commit()
+    DB.close()
+
+    return "success"
 
 
 @app.route("/GetMsgLog", methods=("POST",))
@@ -49,10 +82,11 @@ def GetMsgLog():
     cur = DB.execute(
         f"select id,username,time,content from {name} order by id asc")
     logs = list(cur.fetchall())
+    DB.close()
 
     jsonData = json.dumps(logs, sort_keys=True,
                           indent=4, separators=(',', ': '))
-    #print(jsonData)
+    # print(jsonData)
     return jsonData
 
 
@@ -70,6 +104,7 @@ def login():
     cur = usersDB.execute(
         "select password from users where name='"+user_name+"'")
     DBpwd = cur.fetchone()
+    usersDB.close()
     if DBpwd is None:
         return render_template("index.html", login_state="user-not-exist")
     if password != DBpwd[0]:
@@ -89,12 +124,23 @@ def regis():
         f"select password from users where name='{user_name}'")
     DBpwd = cur.fetchone()
     if DBpwd is not None:
+        usersDB.close()
         return render_template("register.html", regis_state="user-exist")
     if pwd != pwd_rp:
+        usersDB.close()
         return render_template("register.html", regis_state="password-error")
     usersDB.execute(
         f"insert into users (name,password) values('{user_name}','{pwd}')")
     usersDB.commit()
+    usersDB.close()
+
+    DB = sqlite3.connect(f".\\userdatas\\{user_name}.db")
+    DB.execute('''create table if not exists friends
+    (name primary key not null)
+    ''')
+    DB.commit()
+    DB.close()
+
     return app.send_static_file("register_success.html")
 
 

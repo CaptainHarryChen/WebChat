@@ -7,6 +7,8 @@ def DB_pwd():
     (name primary key not null,
     password varchar(16) not null)
     ''')
+    
+    '''
     usersDB.execute(
         "insert into users (name,password) values('CaptainChen','12345')")
     usersDB.execute(
@@ -19,6 +21,7 @@ def DB_pwd():
         "insert into users (name,password) values('Beidou','12345')")
     usersDB.execute(
         "insert into users (name,password) values('Hu Tao','12345')")
+    '''
 
     usersDB.commit()
 
@@ -60,4 +63,4 @@ def DB_msglog():
 
 
 if __name__ == "__main__":
-    DB_msglog()
+    DB_pwd()

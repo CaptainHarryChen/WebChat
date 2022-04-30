@@ -15,7 +15,7 @@
     <script src="./static/jquery-3.6.0.min.js"></script>
 
     <script>
-        var selfName;
+        var selfName = "";
 
         function GetCurTime() {
             var myDate = new Date;
@@ -25,30 +25,49 @@
             var h = myDate.getHours();
             var m = myDate.getMinutes();
             var s = myDate.getSeconds();
-            return year+"/"+mon+"/"+date+" "+h+":"+m+":"+s;
+            return year + "/" + mon + "/" + date + " " + h + ":" + m + ":" + s;
+        }
+
+        function AddFriendBox(name, mode = "append") {
+            var str = '<div id="friend_' + name + '" class="friend_box row_container" name="' + name + '"><img src="./static/avatar.jfif" class="avatar"><div class="col_container card_box"><div class="row_container card_title"><div class="card_name">' + name + '</div><div class="card_time">04-20 10:54</div></div><div class="card_content">hahahaha</div></div></div>';
+            if (mode = "append")
+                $("#friends").append(str);
+            else if (mode = "prepend")
+                $("#friends").prepend(str);
+            $("#friend_" + name).click(OnFriendBoxClick);
         }
 
         $(document).ready(function () {
+            $("#add_friend").click(AddFriend);
+            $("#send_button").click(OnSendMsg);
             $(".friend_box").click(OnFriendBoxClick);
+
             $.post("/GetSelfName", {}, function (ret) {
                 $("#self").html(ret);
                 selfName = ret;
             });
             $.post("/GetFriends", {}, function (ret) {
                 var data = $.parseJSON(ret);
-                for (i in data) {
-                    var name = data[i]["name"];
-                    $("#friends").append('<div id="friend_' + name + '" class="friend_box row_container" name="' + name + '"><img src="./static/avatar.jfif" class="avatar"><div class="col_container card_box"><div class="row_container card_title"><div class="card_name">' + name + '</div><div class="card_time">04-20 10:54</div></div><div class="card_content">hahahaha</div></div></div>');
-                    $("#friend_" + name).click(OnFriendBoxClick);
+                for (i in data)
+                    AddFriendBox(data[i]["name"]);
+            });
+        });
+
+        function AddFriend() {
+            if (selfName == "")
+                return;
+            var friend_name = prompt("输入好友名称", "");
+            $.post("/AddFriend", { "user1": selfName, "user2": friend_name }, function (ret) {
+                if (ret == "not-exist")
+                    alert("该用户不存在");
+                else if (ret == "exist")
+                    alert("该好友已存在");
+                else {
+                    alert("添加成功");
+                    AddFriendBox(friend_name, "prepend");
                 }
             });
-
-            $("#add_friend").click(function () {
-
-            });
-
-            $("#send_button").click(OnSendMsg);
-        });
+        }
 
         function SetMsgLog(name) {
             $("#friend_name").html(name);
@@ -85,7 +104,7 @@
             $("#input_box").val("");
             $("#msg_log").append('<div class="onemsg"><header class="onemsg-header">' + name + ' ' + time + '</header><div class="onemsg-content">' + content + '</div></div>');
             $("#div_msg_log").scrollTop($("#div_msg_log").height());
-            $.post("/recieveMsg",{"msg":content});
+            $.post("/recieveMsg", { "msg": content });
         }
     </script>
 </head>
@@ -98,16 +117,6 @@
             </p>
         </header>
         <div id="friends" class="middle col_container" style="background-color:#6cc7ff">
-            <div class="friend_box row_container" name="test">
-                <img src="./static/avatar.jfif" class="avatar">
-                <div class="col_container card_box">
-                    <div class="row_container card_title">
-                        <div class="card_name">test</div>
-                        <div class="card_time">04-20 10:54</div>
-                    </div>
-                    <div class="card_content">hahahaha</div>
-                </div>
-            </div>
         </div>
         <footer id="functions" class="bottom col_container"
             style="height:100px;border-top: 1px rgb(192, 192, 192) solid;">
@@ -129,7 +138,7 @@
     <div id="chat" class="right col_container">
         <div id="chat_hearder" class="top"
             style="background-color: rgb(227, 248, 255);color:rgb(110, 146, 255);text-shadow: 1px 1px 1px rgb(94, 94, 94);font-size:30px;">
-            <p id="friend_name" style="margin:10px;">asdfasdf</p>
+            <p id="friend_name" style="margin:10px;"></p>
         </div>
         <div id="div_msg_log" class="middle" style="background-color: rgb(227, 248, 255); padding-bottom: 5px;">
             <div id="msg_log">
@@ -137,7 +146,7 @@
         </div>
         <div id="chat_input" class="bottom"
             style="display: flex; flex-direction: row; position: relative; background-color: rgb(255, 255, 255);">
-            <textarea id="input_box"class="input_box" placeholder="请输入消息"></textarea>
+            <textarea id="input_box" class="input_box" placeholder="请输入消息"></textarea>
             <div style="flex-shrink: 0; width: 100px;">
                 <button id="send_button" class="button blue">发送消息</button>
             </div>
