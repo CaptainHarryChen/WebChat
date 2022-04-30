@@ -113,6 +113,12 @@ def login():
     return redirect("/chat")
 
 
+@app.route("/logout")
+def logout():
+    session.pop("userName", None)
+    return redirect("/")
+
+
 @app.route("/regis", methods=("POST",))
 def regis():
     user_name = request.form["user-input"]

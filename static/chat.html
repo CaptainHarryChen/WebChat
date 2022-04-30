@@ -41,6 +41,7 @@
             $("#add_friend").click(AddFriend);
             $("#send_button").click(OnSendMsg);
             $(".friend_box").click(OnFriendBoxClick);
+            $("#logout_button").click(OnLogout);
 
             $.post("/GetSelfName", {}, function (ret) {
                 $("#self").html(ret);
@@ -106,6 +107,10 @@
             $("#div_msg_log").scrollTop($("#div_msg_log").height());
             $.post("/recieveMsg", { "msg": content });
         }
+
+        function OnLogout() {
+            window.location.href = "/logout";
+        }
     </script>
 </head>
 
@@ -129,7 +134,7 @@
                 </button>
             </div>
             <div class="row_container" style="height:50px">
-                <button class="button blue" style="width:100%;height:30px;margin:10px">
+                <button id="logout_button" class="button blue" style="width:100%;height:30px;margin:10px">
                     退出登录
                 </button>
             </div>
