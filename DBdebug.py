@@ -62,5 +62,39 @@ def DB_msglog():
     DB.commit()
 
 
+def DB_msglog2():
+    with sqlite3.connect(".\\msglogdb\\CaptainChen.db") as DB:
+        DB.execute('''create table if not exists 钟离
+        (id int primary key not null,
+        username,
+        time varchar(14),
+        content)
+        ''')
+        DB.execute("insert into 钟离 (id,username,time,content) values(1,'钟离','20220429214800','你好，世界！')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(2,'CaptainChen','20220429214800','Hello, World!')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(3,'钟离','20220429214800','我是钟离。')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(4,'CaptainChen','20220429214800','I am CaptainChen')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(5,'钟离','20220429214800','asdfasdfasdfasda')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(6,'钟离','20220429214800','你好，世界！')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(7,'CaptainChen','20220429214800','Hello, World!')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(8,'钟离','20220429214800','我是钟离。')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(9,'CaptainChen','20220429214800','I am CaptainChen')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(10,'钟离','20220429214800','asdfasdfa\nsdfasda')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(11,'钟离','20220429214800','asdfasdfa\nsdfasda')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(12,'钟离','20220429214800','asdfasdfa\nsdfasda')")
+        DB.execute("insert into 钟离 (id,username,time,content) values(13,'钟离','20220429214800','asdfasdfa\nsdfasda')")
+
+        DB.execute('''create table if not exists Alice
+        (id int primary key not null,
+        username,
+        time varchar(14),
+        content)
+        ''')
+        DB.execute("insert into Alice (id,username,time,content) values(1,'Alice','20220430143702','你好，世界！')")
+
+        DB.commit()
+    
+
+
 if __name__ == "__main__":
-    DB_pwd()
+    DB_msglog2()
