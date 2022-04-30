@@ -17,6 +17,7 @@
     <script>
         var selfName = "";
         var active_name = "";
+        var friends_msgid = {};
 
         function GetCurTime() {
             var myDate = new Date;
@@ -46,6 +47,16 @@
             return PrefixInteger(year, 4) + PrefixInteger(mon, 2) + PrefixInteger(date, 2) + PrefixInteger(h, 4) + PrefixInteger(m, 2) + PrefixInteger(s, 2);
         }
 
+        function ChangeTimeFormat(time) {
+            var year = time.slice(0, 4);
+            var mon = time.slice(4, 6);
+            var date = time.slice(6, 8);
+            var h = time.slice(8, 10);
+            var m = time.slice(10, 12);
+            var s = time.slice(12, 14);
+            return year + "/" + mon + "/" + date + " " + h + ":" + m + ":" + s;
+        }
+
         function AddFriendBox(name, time = "", content = "", mode = "append") {
             if (time != "")
                 time = time.slice(5, 6) + "-" + time.slice(6, 8) + " " + time.slice(8, 10) + ":" + time.slice(10, 12);
@@ -69,8 +80,11 @@
             });
             $.post("/GetFriends", {}, function (ret) {
                 var data = $.parseJSON(ret);
-                for (i in data)
+                for (i in data) {
                     AddFriendBox(data[i]["name"], data[i]["time"], data[i]["content"]);
+                    friends_msgid[data[i]["name"]] = parseInt(data[i]["id"]);
+                }
+                setInterval("CheckMsgUpdate()", 3000);
             });
         });
 
@@ -95,6 +109,7 @@
             $("#msg_log").html('<div id="msg_loading" class="center"><div class="center">加载中……</div></div>');
             $.post("/GetMsgLog", { "class": selfName, "name": name }, function (ret) {
                 var logs = $.parseJSON(ret);
+                $("#msg_log").html("");
                 ShowMsgLog(logs);
             });
         }
@@ -107,17 +122,16 @@
         }
 
         function ShowMsgLog(logs) {
-            $("#msg_log").html("")
             for (i in logs) {
                 var name = logs[i][1];
                 var time = logs[i][2];
                 var content = logs[i][3];
-                time = time.slice(0, 4) + "/" + time.slice(4, 6) + "/" + time.slice(6, 8) + " " + time.slice(8, 10) + ":" + time.slice(10, 12) + ":" + time.slice(12, 14);
+                time = PrefixInteger(time.slice(0, 4), 4) + "/" + PrefixInteger(time.slice(4, 6), 2) + "/" + PrefixInteger(time.slice(6, 8), 2) + " " + PrefixInteger(time.slice(8, 10), 2) + ":" + PrefixInteger(time.slice(10, 12), 2) + ":" + PrefixInteger(time.slice(12, 14), 2);
                 content = content.replace("\r\n", "<br>");
                 content = content.replace("\n", "<br>");
                 $("#msg_log").append('<div class="onemsg"><header class="onemsg-header">' + name + ' ' + time + '</header><div class="onemsg-content">' + content + '</div></div>');
             }
-            $("#div_msg_log").scrollTop($("#div_msg_log").height());
+            $("#div_msg_log").scrollTop($("#div_msg_log").prop("scrollHeight"));
         }
 
         function OnSendMsg() {
@@ -128,9 +142,31 @@
             content = content.replace("\n", "<br>");
             $("#input_box").val("");
             $("#msg_log").append('<div class="onemsg"><header class="onemsg-header">' + name + ' ' + time + '</header><div class="onemsg-content">' + content + '</div></div>');
-            $("#div_msg_log").scrollTop($("#div_msg_log").height());
+            $("#div_msg_log").scrollTop($("#div_msg_log").prop("scrollHeight"));
             $(".friend_box.active .card_content").html(content.slice(0, 20));
             $.post("/recieveMsg", { "class": selfName, "name": active_name, "time": GetCurTime(2), "msg": content });
+        }
+
+        function CheckMsgUpdate() {
+            $.post("/CheckMsgUpdate", {}, function (ret) {
+                var data = $.parseJSON(ret);
+                for (i in data) {
+                    var ele = "#friend_" + data[i]["name"]
+                    var time = data[i]["time"];
+                    if(time != "")
+                        time = time.slice(5, 6) + "-" + time.slice(6, 8) + " " + time.slice(8, 10) + ":" + time.slice(10, 12);
+                    $(ele + " .card_time").html(time);
+                    $(ele + " .card_content").html(data[i]["content"])
+                    if (active_name == data[i]["name"]) {
+                        //alert(123);
+                        $.post("/GetNewMsg", { "class": selfName, "name": active_name, "id": friends_msgid[active_name] }, function (ret) {
+                            var logs = $.parseJSON(ret);
+                            ShowMsgLog(logs);
+                        });
+                    }
+                    friends_msgid[data[i]["name"]] = parseInt(data[i]["id"]);
+                }
+            });
         }
 
         function OnLogout() {

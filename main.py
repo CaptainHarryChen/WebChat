@@ -5,6 +5,8 @@ from flask import Flask, request, render_template, session, redirect
 
 app = Flask(__name__)
 
+cache_msg_id = {}
+
 
 @app.route("/CheckUserName", methods=("POST",))
 def CheckUserName():
@@ -29,6 +31,7 @@ def GetSelfName():
 @app.route("/GetFriends", methods=("POST",))
 def GetFriends():
     user_name = session["userName"]
+
     with sqlite3.connect(f".\\userdatas\\{user_name}.db") as userDB:
         cur = userDB.execute("select name from friends")
         names = []
@@ -37,8 +40,10 @@ def GetFriends():
                 name = name[0]
                 msglogDB.execute(
                     f"create table if not exists {name} (id int primary key not null,username,time varchar(14),content)")
+                id = msglogDB.execute(f"select MAX(id) as max_id from {name}").fetchone()
+                id = id[0] if id[0] is not None else 0
                 cur2 = msglogDB.execute(
-                    f"select time,content from {name} where id=(select MAX(id) as max_time from {name})")
+                    f"select time,content from {name} where id={id}")
                 cur2 = cur2.fetchone()
                 if cur2 is None:
                     time = "0"
@@ -47,11 +52,12 @@ def GetFriends():
                     time = cur2[0]
                     content = cur2[1]
                 # print(name,time,content)
-                names.append((name, time, content))
+                cache_msg_id[user_name][name] = id
+                names.append((name, time, content, id))
 
     names.sort(key=lambda x: x[1], reverse=True)
     names = [{"name": name, "time": time if time != "0" else "",
-              "content": content[:20]} for name, time, content in names]
+              "content": content[:20], "id": id} for name, time, content, id in names]
 
     jsonData = json.dumps(names, sort_keys=True,
                           indent=4, separators=(',', ': '))
@@ -83,6 +89,8 @@ def AddFriend():
         DB.execute(f"insert into friends (name) values('{user_name}')")
         DB.commit()
 
+    cache_msg_id[user_name][friend_name] = 0
+
     return "success"
 
 
@@ -105,6 +113,26 @@ def GetMsgLog():
     return jsonData
 
 
+@app.route("/GetNewMsg", methods=("POST",))
+def GetNewMsg():
+    user_name = session["userName"]
+    typ = request.form["class"]
+    name = request.form["name"]
+    afterID = request.form["id"]
+
+    with sqlite3.connect(f".\\msglogdb\\{typ}.db") as DB:
+        DB.execute(
+            f'''create table if not exists {name} (id int primary key not null,username,time varchar(14),content)''')
+        cur = DB.execute(
+            f"select id,username,time,content from {name} where id > {afterID} order by id asc")
+        logs = list(cur.fetchall())
+
+    jsonData = json.dumps(logs, sort_keys=True,
+                          indent=4, separators=(',', ': '))
+    # print(jsonData)
+    return jsonData
+
+
 @app.route("/recieveMsg", methods=("POST",))
 def recieveMsg():
     user_name = session["userName"]
@@ -113,6 +141,9 @@ def recieveMsg():
     name = request.form["name"]
     content = request.form["msg"]
 
+    print(user_name, typ, time, name, content)
+
+    # Add msg to own database or group database
     with sqlite3.connect(f".\\msglogdb\\{typ}.db") as DB:
         DB.execute(
             f'''create table if not exists {name} (id int primary key not null,username,time varchar(14),content)''')
@@ -125,7 +156,10 @@ def recieveMsg():
         DB.execute(
             f"insert into {name} (id,username,time,content) values({id},'{user_name}','{time}','{content}')")
         DB.commit()
-    
+        # print(f"set {name} id to {id}")
+        cache_msg_id[user_name][name] = id
+
+    # Add msg the other person's database
     if typ != "Group":
         with sqlite3.connect(f".\\msglogdb\\{name}.db") as DB:
             DB.execute(
@@ -141,6 +175,45 @@ def recieveMsg():
             DB.commit()
 
     return ""
+
+
+@app.route("/CheckMsgUpdate", methods=("POST",))
+def CheckMsgUpdate():
+    user_name = session["userName"]
+    saved_id = cache_msg_id[user_name]
+
+    ret = []
+    with sqlite3.connect(f".\\msglogdb\\{user_name}.db") as msglogDB:
+        for name, id in saved_id.items():
+            msglogDB.execute(
+                f"create table if not exists {name} (id int primary key not null,username,time varchar(14),content)")
+            newid = msglogDB.execute(
+                f"select MAX(id) as max_id from {name}").fetchone()
+            newid = newid[0] if newid[0] is not None else 0
+            #print(user_name, name, saved_id[name], newid)
+
+            if saved_id[name] < newid:
+                #print("True")
+                cur2 = msglogDB.execute(
+                    f"select time,content from {name} where id={newid}")
+                cur2 = cur2.fetchone()
+                if cur2 is None:
+                    time = "0"
+                    content = ""
+                else:
+                    time = cur2[0]
+                    content = cur2[1]
+
+                cache_msg_id[user_name][name] = newid
+                #print(user_name, name, saved_id[name], newid)
+                ret.append((name, time, content, newid))
+
+    ret = [{"name": name, "time": time if time != "0" else "",
+            "content": content[:20], "id": id} for name, time, content, id in ret]
+
+    jsonData = json.dumps(ret, sort_keys=True,
+                          indent=4, separators=(',', ': '))
+    return jsonData
 
 
 @app.route("/")
@@ -162,13 +235,17 @@ def login():
         return render_template("index.html", login_state="user-not-exist")
     if password != DBpwd[0]:
         return render_template("index.html", login_state="password-error")
+    
     session["userName"] = user_name
+    cache_msg_id[user_name] = {}
+
     return redirect("/chat")
 
 
 @app.route("/logout")
 def logout():
-    session.pop("userName", None)
+    cache_msg_id.pop(session["userName"])
+    session.clear()
     return redirect("/")
 
 
