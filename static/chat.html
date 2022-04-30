@@ -16,6 +16,18 @@
 
     <script>
         var selfName;
+
+        function GetCurTime() {
+            var myDate = new Date;
+            var year = myDate.getFullYear();
+            var mon = myDate.getMonth() + 1;
+            var date = myDate.getDate();
+            var h = myDate.getHours();
+            var m = myDate.getMinutes();
+            var s = myDate.getSeconds();
+            return year+"/"+mon+"/"+date+" "+h+":"+m+":"+s;
+        }
+
         $(document).ready(function () {
             $(".friend_box").click(OnFriendBoxClick);
             $.post("/GetSelfName", {}, function (ret) {
@@ -34,6 +46,8 @@
             $("#add_friend").click(function () {
 
             });
+
+            $("#send_button").click(OnSendMsg);
         });
 
         function SetMsgLog(name) {
@@ -62,6 +76,16 @@
                 $("#msg_log").append('<div class="onemsg"><header class="onemsg-header">' + name + ' ' + time + '</header><div class="onemsg-content">' + content + '</div></div>');
             }
             $("#div_msg_log").scrollTop($("#div_msg_log").height());
+        }
+
+        function OnSendMsg() {
+            var name = selfName;
+            var time = GetCurTime();
+            var content = $("#input_box").val();
+            $("#input_box").val("");
+            $("#msg_log").append('<div class="onemsg"><header class="onemsg-header">' + name + ' ' + time + '</header><div class="onemsg-content">' + content + '</div></div>');
+            $("#div_msg_log").scrollTop($("#div_msg_log").height());
+            $.post("/recieveMsg",{"msg":content});
         }
     </script>
 </head>
@@ -107,12 +131,16 @@
             style="background-color: rgb(227, 248, 255);color:rgb(110, 146, 255);text-shadow: 1px 1px 1px rgb(94, 94, 94);font-size:30px;">
             <p id="friend_name" style="margin:10px;">asdfasdf</p>
         </div>
-        <div id="div_msg_log" class="middle" style="background-color: rgb(227, 248, 255);">
+        <div id="div_msg_log" class="middle" style="background-color: rgb(227, 248, 255); padding-bottom: 5px;">
             <div id="msg_log">
             </div>
         </div>
-        <div id="chat_input" class="bottom" style="background-color: rgb(255, 255, 255);">
-            <div id="input_box" class="input_box" placeholder="请输入消息" contenteditable></div>
+        <div id="chat_input" class="bottom"
+            style="display: flex; flex-direction: row; position: relative; background-color: rgb(255, 255, 255);">
+            <textarea id="input_box"class="input_box" placeholder="请输入消息"></textarea>
+            <div style="flex-shrink: 0; width: 100px;">
+                <button id="send_button" class="button blue">发送消息</button>
+            </div>
         </div>
     </div>
 </body>
