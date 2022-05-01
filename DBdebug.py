@@ -95,6 +95,11 @@ def DB_msglog2():
         DB.commit()
     
 
+def DB_group():
+    with sqlite3.connect("groups.db") as DB:
+        DB.execute("create table if not exists groups (id int primary key not null,name)")
+        DB.commit()
+
 
 if __name__ == "__main__":
-    DB_msglog2()
+    DB_group()
