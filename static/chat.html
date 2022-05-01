@@ -89,8 +89,19 @@
                     friends_msgid[data[i]["name"]] = parseInt(data[i]["id"]);
                 }
                 setInterval("CheckMsgUpdate()", 3000);
+                setInterval("UpdateFriendList()", 20000);
             });
         });
+
+        function UpdateFriendList() {
+            $.post("/UpdateFriendList", {}, function (ret) {
+                var data = $.parseJSON(ret);
+                for (i in data) {
+                    AddFriendBox(data[i]["name"], data[i]["time"], data[i]["content"], mode = "prepend");
+                    friends_msgid[data[i]["name"]] = parseInt(data[i]["id"]);
+                }
+            });
+        }
 
         function AddFriend() {
             if (selfName == "")
