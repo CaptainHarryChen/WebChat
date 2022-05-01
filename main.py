@@ -35,11 +35,13 @@ def GetFriends():
     with sqlite3.connect(f".\\userdatas\\{user_name}.db") as userDB:
         cur = userDB.execute("select name from friends")
         names = []
+        cur = list(cur.fetchall())
         with sqlite3.connect(f".\\msglogdb\\{user_name}.db") as msglogDB:
-            for name in cur.fetchall():
+            for name in cur:
+                name = name[0]
                 if name[:5] == "Group":
                     continue
-                name = name[0]
+
                 msglogDB.execute(
                     f"create table if not exists {name} (id int primary key not null,username,time varchar(14),content)")
                 id = msglogDB.execute(f"select MAX(id) as max_id from {name}").fetchone()
@@ -58,10 +60,76 @@ def GetFriends():
                 names.append((name, time, content, id))
             
         with sqlite3.connect(".\\msglogdb\\Group.db") as msglogDB:
-            for name in cur.fetchall():
+            for name in cur:
+                name = name[0]
+                # print(f"user {user_name}'s group: {name}")
                 if name[:5] != "Group":
                     continue
+
+                msglogDB.execute(
+                    f"create table if not exists {name} (id int primary key not null,username,time varchar(14),content)")
+                id = msglogDB.execute(f"select MAX(id) as max_id from {name}").fetchone()
+                id = id[0] if id[0] is not None else 0
+                cur2 = msglogDB.execute(
+                    f"select time,content from {name} where id={id}")
+                cur2 = cur2.fetchone()
+                if cur2 is None:
+                    time = "0"
+                    content = ""
+                else:
+                    time = cur2[0]
+                    content = cur2[1]
+                # print(name,time,content)
+                cache_msg_id[user_name][name] = id
+                names.append((name, time, content, id))
+
+    names.sort(key=lambda x: x[1], reverse=True)
+    names = [{"name": name, "time": time if time != "0" else "",
+              "content": content[:20], "id": id} for name, time, content, id in names]
+
+    jsonData = json.dumps(names, sort_keys=True,
+                          indent=4, separators=(',', ': '))
+    # print(jsonData)
+    return jsonData
+
+
+@app.route("/UpdateFriendList",methods=('POST',))
+def UpdateFriendList():
+    user_name = session["userName"]
+
+    with sqlite3.connect(f".\\userdatas\\{user_name}.db") as userDB:
+        cur = userDB.execute("select name from friends")
+        names = []
+        cur = list(cur.fetchall())
+        with sqlite3.connect(f".\\msglogdb\\{user_name}.db") as msglogDB:
+            for name in cur:
                 name = name[0]
+                if name[:5] == "Group" or name in cache_msg_id[user_name].keys():
+                    continue
+
+                msglogDB.execute(
+                    f"create table if not exists {name} (id int primary key not null,username,time varchar(14),content)")
+                id = msglogDB.execute(f"select MAX(id) as max_id from {name}").fetchone()
+                id = id[0] if id[0] is not None else 0
+                cur2 = msglogDB.execute(
+                    f"select time,content from {name} where id={id}")
+                cur2 = cur2.fetchone()
+                if cur2 is None:
+                    time = "0"
+                    content = ""
+                else:
+                    time = cur2[0]
+                    content = cur2[1]
+                # print(name,time,content)
+                cache_msg_id[user_name][name] = id
+                names.append((name, time, content, id))
+            
+        with sqlite3.connect(".\\msglogdb\\Group.db") as msglogDB:
+            for name in cur:
+                name = name[0]
+                if name[:5] != "Group" or name in cache_msg_id[user_name].keys():
+                    continue
+
                 msglogDB.execute(
                     f"create table if not exists {name} (id int primary key not null,username,time varchar(14),content)")
                 id = msglogDB.execute(f"select MAX(id) as max_id from {name}").fetchone()
@@ -155,6 +223,7 @@ def CreateGroup():
     # Add group to everyone's friend list
     for user in users:
         with sqlite3.connect(f".\\userdatas\\{user}.db") as DB:
+            # print(f"Add {group_name} to user {user}")
             DB.execute(f"insert into friends (name) values('Group_{group_id}')")
             DB.commit()
 
@@ -188,7 +257,7 @@ def GetNewMsg():
     name = request.form["name"]
     afterID = request.form["id"]
     
-    print("GetNewMsg", typ, name, afterID)
+    # print("GetNewMsg", typ, name, afterID)
 
     with sqlite3.connect(f".\\msglogdb\\{typ}.db") as DB:
         DB.execute(
@@ -211,7 +280,7 @@ def recieveMsg():
     name = request.form["name"]
     content = request.form["msg"]
 
-    print(user_name, typ, time, name, content)
+    # print(user_name, typ, time, name, content)
 
     # Add msg to own database or group database
     with sqlite3.connect(f".\\msglogdb\\{typ}.db") as DB:
@@ -252,7 +321,7 @@ def CheckMsgUpdate():
     user_name = session["userName"]
     saved_id = cache_msg_id[user_name]
 
-    print(user_name, saved_id)
+    # print(user_name, saved_id)
 
     ret = []
     with sqlite3.connect(f".\\msglogdb\\{user_name}.db") as msglogDB:
