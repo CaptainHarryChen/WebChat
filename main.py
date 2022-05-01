@@ -218,11 +218,16 @@ def CheckMsgUpdate():
 
 @app.route("/")
 def index():
+    if session.get("userName") is not None:
+        return redirect("/chat")
     return render_template("index.html", login_state="1")
 
 
 @app.route("/login", methods=("POST",))
 def login():
+    if session.get("userName") is not None:
+        return app.send_static_file("repeat_login.html")
+
     user_name = request.form["user-name"]
     password = request.form["password"]
 
