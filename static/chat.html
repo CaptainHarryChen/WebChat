@@ -138,6 +138,7 @@
             $(this).addClass("active");
             active_name = $(this).attr("name");
             SetMsgLog($(this).attr("name"));
+            $("#chat_input .mask").css("display","none");
         }
 
         function OnCreateGroup() {
@@ -284,6 +285,7 @@
         </div>
         <div id="chat_input" class="bottom"
             style="display: flex; flex-direction: row; position: relative; background-color: rgb(255, 255, 255);">
+            <div class="mask" style="position:absolute;background-color: rgba(0, 0, 0, 0.264);display:block;"></div>
             <textarea id="input_box" class="input_box" placeholder="请输入消息"></textarea>
             <div style="flex-shrink: 0; width: 100px;">
                 <button id="send_button" class="button blue">发送消息</button>
